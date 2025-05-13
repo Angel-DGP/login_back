@@ -1,21 +1,18 @@
 const express = require("express");
 const app = express();
-const puerto = 3001;
-const ip = "172.16.0.26";
 const cors = require('cors');
 app.use(cors());
 const { Client } = require("pg");
+const puerto = 3001
 app.use(express.json());
+require('dotenv').config()
 
-const client = new Client({
-  user: "postgres",
-  host: ip,
-  database: "data_login",
-  password: "admin",
-  port: 5432,
+const client = new Client({ 
+connectionString: process.env.DATABASE_URL,
+ssl: true
 });
 app.listen(puerto, () => {
-  console.log("Servidor listo en puerto " + puerto);
+  console.log("Servidor listo ");
     client.connect(); 
   
 });
