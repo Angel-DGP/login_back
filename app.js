@@ -55,5 +55,23 @@ app.post("/getUserById", (req, res) => {
       res.status(500).send("Error al encontrar usuario");
     });
 });
+app.post("/existing", (req, res) => {
+  const { email_user } = req.body;
+
+  client
+    .query("SELECT * FROM users WHERE email_user = $1", [email_user])
+    .then((result) => {
+      if (result.rows.length > 0) {
+        res.status(200).json({ exists: true, user: result.rows[0] });
+      } else {
+        res.status(200).json({ exists: false });
+      }
+    })
+    .catch((err) => {
+      console.error("Error al verificar usuario existente:", err);
+      res.status(500).send("Error al verificar usuario");
+    });
+});
+
 
 
