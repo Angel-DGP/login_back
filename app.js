@@ -20,7 +20,7 @@ app.post("/postUser", (req, res) => {
   console.log(req.body);
   client
     .query(
-      "INSERT INTO users (name_user, password_user, email_user) VALUES ($1, crypt('$2', gen_salt('bf'), $3) RETURNING *",
+      "INSERT INTO users (name_user, password_user, email_user) VALUES ($1, crypt($2, gen_salt('bf')), $3) RETURNING *",
       [name_user, password_user, email_user]
     )
     .then((result) => {
@@ -35,20 +35,25 @@ app.post("/postUser", (req, res) => {
 
 
 app.post("/getUserById", (req, res) => {
-  const { name_user, password_user, email_user } = req.body;
+  const { name_user, password_user } = req.body;
   console.log(req.body);
   client
     .query(
-      "SELECT * FROM users WHERE name_user = '$1' AND password_user = crypt('$2', password_user);",
+      "SELECT * FROM users WHERE name_user = $1 AND password_user = crypt($2, password_user)",
       [name_user, password_user]
     )
     .then((result) => {
-      console.log("Usuario encontrado:", result.rows[0]);
-      res.status(201).json(result.rows[0]);
+      if (result.rows.length === 0) {
+        res.status(401).json({ error: "Credenciales incorrectas" });
+      } else {
+        console.log("Usuario encontrado:", result.rows[0]);
+        res.status(200).json(result.rows[0]);
+      }
     })
     .catch((err) => {
       console.error("Error al encontrar usuario:", err);
       res.status(500).send("Error al encontrar usuario");
     });
 });
+
 
