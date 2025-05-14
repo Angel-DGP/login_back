@@ -56,13 +56,14 @@ app.post("/getUserById", (req, res) => {
     });
 });
 app.post("/existing", (req, res) => {
-  const { email_user } = req.body;
+  const { email_user, name_user } = req.body;
 
   client
-    .query("SELECT * FROM users WHERE email_user = $1", [email_user])
+    .query("SELECT * FROM users WHERE email_user = $1 and name_user = $2", [email_user, name_user])
     .then((result) => {
       if (result.rows.length > 0) {
         res.status(200).json({ exists: true, user: result.rows[0] });
+        console.log(result.rows[0])
       } else {
         res.status(200).json({ exists: false });
       }
